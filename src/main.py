@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import os
 import random
 import dash
@@ -23,7 +24,7 @@ def load_quiz_data():
     CSV_FILE = os.path.join(data_folder, "quiz_data.csv")
     XLSX_FILE = os.path.join(data_folder, "quiz_data.xlsx")
 
-    required_columns = {"type","frage","solution","a","b","c","d","e"}
+    required_columns = {"type","frage","solution","a","b","c","d","e","f","info"}
 
     df = None
 
@@ -57,6 +58,8 @@ def load_quiz_data():
         raise ValueError(
             f"Die Daten-Datei muss mindestens diese Spalten enthalten: {required_columns}"
         )
+
+    df = df[((df["info"].isna()) | (df["info"] == "falsch")) & ((df["type"] == "MC") | (df["type"] == "FT"))]
 
     return df
 
@@ -92,19 +95,24 @@ def get_question_data(df, idx):
         "c": str(row["c"]),
         "d": str(row["d"]),
         "e": str(row["e"]),
+        "f": str(row["f"]),
     }
     return qtype, frage, solution_letters, mc_dict
 
 def build_mc_options(mc_dict, disabled=False):
     options = []
-    for letter in ["a","b","c","d","e"]:
-        txt = mc_dict[letter]
-        opt = {
-            "label": txt,
-            "value": letter,
-            "disabled": disabled
-        }
-        options.append(opt)
+    
+    for letter in ["a", "b", "c", "d", "e", "f"]:
+        txt = mc_dict.get(letter)
+        
+        if txt is not None and str(txt).strip() and str(txt).lower() != "nan":
+            opt = {
+                "label": txt,
+                "value": letter,
+                "disabled": disabled
+            }
+            options.append(opt)
+    
     return options
 
 def highlight_correct_answers(mc_dict, correct_letters):
