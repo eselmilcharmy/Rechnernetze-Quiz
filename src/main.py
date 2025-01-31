@@ -118,16 +118,17 @@ def build_mc_options(mc_dict, disabled=False):
 def highlight_correct_answers(mc_dict, correct_letters):
     new_options = []
     correct_set = set(correct_letters)
-    for letter in ["a","b","c","d","e"]:
-        text = mc_dict[letter]
+    for letter in ["a","b","c","d","e","f"]:
+        text = mc_dict.get(letter)
         style = {}
         disabled = True
         if letter in correct_set:
             style = {"backgroundColor": "#d4edda"}  # helgrün
-        new_options.append({
-            "label": html.Span(text, style=style),
-            "value": letter,
-            "disabled": disabled
+        if text is not None and str(text).strip() and str(text).lower() != "nan": 
+            new_options.append({
+                "label": html.Span(text, style=style),
+                "value": letter,
+                "disabled": disabled
         })
     return new_options
 
