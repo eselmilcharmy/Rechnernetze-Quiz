@@ -20,7 +20,7 @@ def load_quiz_data():
     data_folder = os.path.join(
         os.path.dirname(os.path.dirname(__file__)), "Data"
     )
-
+    global file_path
     CSV_FILE = os.path.join(data_folder, "quiz_data.csv")
     XLSX_FILE = os.path.join(data_folder, "quiz_data.xlsx")
 
@@ -32,6 +32,7 @@ def load_quiz_data():
     if os.path.exists(CSV_FILE):
         try:
             df = pd.read_csv(CSV_FILE)
+            file_path = CSV_FILE
             print(f"CSV '{CSV_FILE}' erfolgreich geladen.")
         except Exception as e:
             print(f"Fehler beim Einlesen der CSV '{CSV_FILE}': {e}")
@@ -42,6 +43,7 @@ def load_quiz_data():
         if os.path.exists(XLSX_FILE):
             try:
                 df = pd.read_excel(XLSX_FILE)
+                file_path = XLSX_FILE
                 print(f"Excel '{XLSX_FILE}' erfolgreich geladen.")
             except Exception as e:
                 raise FileNotFoundError(
@@ -58,7 +60,7 @@ def load_quiz_data():
         raise ValueError(
             f"Die Daten-Datei muss mindestens diese Spalten enthalten: {required_columns}"
         )
-
+    df["info"] = df["info"].astype("string")
     df = df[((df["info"].isna()) | (df["info"] == "falsch")) & ((df["type"] == "MC") | (df["type"] == "FT"))]
 
     return df
@@ -220,6 +222,26 @@ def update_statistics(question_order, current_idx, score):
         return f"Endergebnis: {score} von {total} korrekt!"
     else:
         return f"Aktueller Punktestand: {score} / {total}."
+
+def update_info_in_excel(old_idx, is_correct):
+    """
+    Aktualisiert die Spalte 'info' in der Excel- oder CSV-Datei.
+
+    - old_idx: Index der letzten Frage im DataFrame.
+    - is_correct: True, wenn die Antwort richtig war, sonst False.
+   
+    """
+    if 'file_path' not in globals():
+        raise RuntimeError("Dateipfad nicht gesetzt. `load_quiz_data()` wurde nicht ausgeführt.")
+    df["info"] = df["info"].astype("string")
+    df.at[old_idx, "info"] = "richtig" if is_correct else "falsch"
+
+    # Datei speichern
+    if file_path.endswith(".csv"):
+        df.to_csv(file_path, index=False)  # Speichert als CSV
+    else:
+        df.to_excel(file_path, index=False)  # Speichert als Excel
+
 
 # -------------------------------------------------------------
 # Dash-App
@@ -413,7 +435,7 @@ def master_callback(n_restart,
                 # Frage war falsch -> merken
                 if old_idx not in incorrect_list:
                     incorrect_list.append(old_idx)
-
+            update_info_in_excel(old_idx, last_correct)
             current_idx, score, revealed = next_question(current_idx, score, last_correct)
         else:
             current_idx += 1
