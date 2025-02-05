@@ -1,3 +1,3 @@
 # Rechnernetze-Quiz
 
-Für Administration von Rechnernetzen. Fragen sind momentan noch von uns vorausgewählt! (Albinot Hajrizaj, Benjamin Fischer)
+Für Administration von Rechnernetzen. Fragen sind vollständig (WS2024/2025)! (Albinot Hajrizaj, Benjamin Fischer)
