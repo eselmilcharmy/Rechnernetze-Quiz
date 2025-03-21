@@ -10,6 +10,8 @@ import plotly.graph_objects as go
 # -------------------------------------------------------------
 # Fallback-Funktion: CSV oder XLSX einlesen
 # -------------------------------------------------------------
+
+
 def load_quiz_data():
     """
     Versucht, quiz_data.csv einzulesen.
@@ -24,7 +26,8 @@ def load_quiz_data():
     CSV_FILE = os.path.join(data_folder, "quiz_data.csv")
     XLSX_FILE = os.path.join(data_folder, "quiz_data.xlsx")
 
-    required_columns = {"type","frage","solution","a","b","c","d","e","f","info"}
+    required_columns = {"type", "frage", "solution",
+                        "a", "b", "c", "d", "e", "f", "info"}
 
     df = None
 
@@ -59,9 +62,11 @@ def load_quiz_data():
             f"Die Daten-Datei muss mindestens diese Spalten enthalten: {required_columns}"
         )
 
-    df = df[((df["info"].isna()) | (df["info"] == "falsch")) & ((df["type"] == "MC") | (df["type"] == "FT"))]
+    df = df[((df["info"].isna()) | (df["info"] == "falsch"))
+            & ((df["type"] == "MC") | (df["type"] == "FT"))]
 
     return df
+
 
 # -------------------------------------------------------------
 # Daten einlesen
@@ -71,18 +76,23 @@ df = load_quiz_data()
 # -------------------------------------------------------------
 # Hilfsfunktionen
 # -------------------------------------------------------------
+
+
 def shuffle_questions(dataframe):
     indices = list(dataframe.index)
     random.shuffle(indices)
     return indices
 
+
 def init_quiz(dataframe):
     question_order = shuffle_questions(dataframe)
     return question_order, 0, 0, False
 
+
 def restart_quiz(dataframe):
     new_order = shuffle_questions(dataframe)
     return new_order, 0, 0, False
+
 
 def get_question_data(df, idx):
     row = df.loc[idx]
@@ -99,12 +109,13 @@ def get_question_data(df, idx):
     }
     return qtype, frage, solution_letters, mc_dict
 
+
 def build_mc_options(mc_dict, disabled=False):
     options = []
-    
+
     for letter in ["a", "b", "c", "d", "e", "f"]:
         txt = mc_dict.get(letter)
-        
+
         if txt is not None and str(txt).strip() and str(txt).lower() != "nan":
             opt = {
                 "label": txt,
@@ -112,25 +123,27 @@ def build_mc_options(mc_dict, disabled=False):
                 "disabled": disabled
             }
             options.append(opt)
-    
+
     return options
+
 
 def highlight_correct_answers(mc_dict, correct_letters):
     new_options = []
     correct_set = set(correct_letters)
-    for letter in ["a","b","c","d","e","f"]:
+    for letter in ["a", "b", "c", "d", "e", "f"]:
         text = mc_dict.get(letter)
         style = {}
         disabled = True
         if letter in correct_set:
             style = {"backgroundColor": "#d4edda"}  # helgrün
-        if text is not None and str(text).strip() and str(text).lower() != "nan": 
+        if text is not None and str(text).strip() and str(text).lower() != "nan":
             new_options.append({
                 "label": html.Span(text, style=style),
                 "value": letter,
                 "disabled": disabled
-        })
+            })
     return new_options
+
 
 def _split_and_clean(text):
     """
@@ -142,6 +155,7 @@ def _split_and_clean(text):
     tokens = tmp.split(",")
     cleaned = [t.strip().lower() for t in tokens if t.strip()]
     return set(cleaned)
+
 
 def check_question(qtype, solution_letters, mc_dict, user_checklist, user_text, revealed):
     if revealed:
@@ -179,12 +193,14 @@ def check_question(qtype, solution_letters, mc_dict, user_checklist, user_text, 
             if len(correct_texts) == 1:
                 feedback = f"Falsch! Richtige Antwort: {correct_texts[0]}"
             else:
-                feedback = "Falsch! Richtige Antworten: " + ", ".join(correct_texts)
+                feedback = "Falsch! Richtige Antworten: " + \
+                    ", ".join(correct_texts)
 
         return (feedback, True, is_correct, [])
 
     # Fallback
     return ("Unbekannter Typ!", True, False, [])
+
 
 def next_question(current_idx, score, is_correct):
     if is_correct:
@@ -192,6 +208,7 @@ def next_question(current_idx, score, is_correct):
     current_idx += 1
     revealed = False
     return current_idx, score, revealed
+
 
 def update_ui(question_order, current_idx, revealed, df, current_mc_options):
     if not question_order:
@@ -214,12 +231,14 @@ def update_ui(question_order, current_idx, revealed, df, current_mc_options):
     else:
         return frage, progress_value, [], qtype
 
+
 def update_statistics(question_order, current_idx, score):
     total = len(question_order) if question_order else 0
     if current_idx >= total and total > 0:
         return f"Endergebnis: {score} von {total} korrekt!"
     else:
         return f"Aktueller Punktestand: {score} / {total}."
+
 
 # -------------------------------------------------------------
 # Dash-App
@@ -229,23 +248,31 @@ server = app.server
 
 # Titel + Layout
 header = dbc.Row(
-    dbc.Col(html.H2("Quiz", 
+    dbc.Col(html.H2("Quiz",
                     className="text-center my-4"), width=12)
 )
 
-progress_bar = dbc.Progress(id="progress-bar", value=0, striped=True, animated=True, className="mb-4")
-question_text = html.Div(id="question-text", className="mb-3", style={"fontSize":"1.25rem","fontWeight":"bold"})
+progress_bar = dbc.Progress(
+    id="progress-bar", value=0, striped=True, animated=True, className="mb-4")
+question_text = html.Div(id="question-text", className="mb-3",
+                         style={"fontSize": "1.25rem", "fontWeight": "bold"})
 
-checkboxes = dbc.Checklist(id="answer-checklist", options=[], value=[], inline=False)
-answer_input = dbc.Input(id="answer-input", type="text", placeholder="(Freitext eingeben...)")
+checkboxes = dbc.Checklist(id="answer-checklist",
+                           options=[], value=[], inline=False)
+answer_input = dbc.Input(id="answer-input", type="text",
+                         placeholder="(Freitext eingeben...)")
 
-feedback_text = html.Div(id="feedback-text", className="mt-3", style={"fontSize":"1rem","fontStyle":"italic"})
+feedback_text = html.Div(id="feedback-text", className="mt-3",
+                         style={"fontSize": "1rem", "fontStyle": "italic"})
 
-btn_check = dbc.Button("Auflösen", id="btn-check", color="primary", className="me-2 mb-2")
-btn_next = dbc.Button("Nächste Frage", id="btn-next", color="secondary", className="me-2 mb-2")
-btn_restart = dbc.Button("Quiz erneut starten", id="btn-restart", color="danger", className="mb-2")
+btn_check = dbc.Button("Auflösen", id="btn-check",
+                       color="primary", className="me-2 mb-2")
+btn_next = dbc.Button("Nächste Frage", id="btn-next",
+                      color="secondary", className="me-2 mb-2")
+btn_restart = dbc.Button("Quiz erneut starten",
+                         id="btn-restart", color="danger", className="mb-2")
 btn_repeat_mistakes = dbc.Button("Falsche Fragen erneut lernen", id="btn-repeat-mistakes",
-                                 color="warning", className="mb-2", style={"display":"none"})
+                                 color="warning", className="mb-2", style={"display": "none"})
 
 buttons = dbc.Row([
     dbc.Col(btn_check, width="auto"),
@@ -255,7 +282,7 @@ buttons = dbc.Row([
 ], justify="center")
 
 statistics_text = html.Div(id="statistics-text", className="mt-4",
-                           style={"fontSize":"1.1rem","fontWeight":"bold","textAlign":"center"})
+                           style={"fontSize": "1.1rem", "fontWeight": "bold", "textAlign": "center"})
 
 # Copyright
 footer = html.Div(
@@ -292,6 +319,8 @@ app.layout = dbc.Container([
 # -------------------------------------------------------------
 # Callback
 # -------------------------------------------------------------
+
+
 @app.callback(
     # Alle Outputs
     Output("store-question-order", "data"),
@@ -351,7 +380,8 @@ def master_callback(n_restart,
                     incorrect_list):
 
     ctx = callback_context
-    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
+    triggered_id = ctx.triggered[0]["prop_id"].split(
+        ".")[0] if ctx.triggered else ""
     feedback = ""
 
     # 1) Initialisierung
@@ -390,7 +420,8 @@ def master_callback(n_restart,
     # 3) Auflösen
     if triggered_id == "btn-check" and n_check:
         if question_order and current_idx < len(question_order):
-            qtype, frage, solution_letters, mc_dict = get_question_data(df, question_order[current_idx])
+            qtype, frage, solution_letters, mc_dict = get_question_data(
+                df, question_order[current_idx])
             fb, new_revealed, is_correct, new_opts = check_question(
                 qtype, solution_letters, mc_dict, user_checklist, user_text, revealed
             )
@@ -414,7 +445,8 @@ def master_callback(n_restart,
                 if old_idx not in incorrect_list:
                     incorrect_list.append(old_idx)
 
-            current_idx, score, revealed = next_question(current_idx, score, last_correct)
+            current_idx, score, revealed = next_question(
+                current_idx, score, last_correct)
         else:
             current_idx += 1
             revealed = False
@@ -426,7 +458,8 @@ def master_callback(n_restart,
         last_correct = False
 
     # 5) UI aktualisieren
-    frage, progress_value, mc_opts, qtype = update_ui(question_order, current_idx, revealed, df, current_mc_options)
+    frage, progress_value, mc_opts, qtype = update_ui(
+        question_order, current_idx, revealed, df, current_mc_options)
     if mc_opts:
         current_mc_options = mc_opts
 
@@ -435,7 +468,8 @@ def master_callback(n_restart,
     # 6) Dynamische Styles
     checklist_style = {"display": "block"}
     input_style = {"display": "block"}
-    btn_check_style = {"display": "inline-block"}    # Standard: Auflösen sichtbar
+    # Standard: Auflösen sichtbar
+    btn_check_style = {"display": "inline-block"}
     btn_next_style = {"display": "inline-block"}
     repeat_btn_style = {"display": "none"}
 
@@ -493,6 +527,7 @@ def master_callback(n_restart,
 
         incorrect_list
     )
+
 
 # -------------------------------------------------------------
 # Start
