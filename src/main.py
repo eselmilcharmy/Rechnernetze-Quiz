@@ -229,7 +229,7 @@ server = app.server
 
 # Titel + Layout
 header = dbc.Row(
-    dbc.Col(html.H2("Rechnernetze-Quiz", 
+    dbc.Col(html.H2("Quiz", 
                     className="text-center my-4"), width=12)
 )
 
