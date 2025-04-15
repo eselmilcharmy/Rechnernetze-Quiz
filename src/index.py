@@ -284,9 +284,14 @@ buttons = dbc.Row([
 statistics_text = html.Div(id="statistics-text", className="mt-4",
                            style={"fontSize": "1.1rem", "fontWeight": "bold", "textAlign": "center"})
 
-# Copyright
+# Copyright & Git-Repo-Link
 footer = html.Div(
-    "© 2025 Albinot Hajrizaj",
+    html.A(
+        "© 2025 Albinot Hajrizaj – GitHub Repository",
+        href="https://github.com/eselmilcharmy/Rechnernetze-Quiz",
+        target="_blank",
+        style={"color": "inherit", "textDecoration": "none"}
+    ),
     style={"fontSize": "0.9rem", "textAlign": "center", "marginTop": "30px"}
 )
 
@@ -533,4 +538,4 @@ def master_callback(n_restart,
 # Start
 # -------------------------------------------------------------
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
