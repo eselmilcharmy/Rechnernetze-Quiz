@@ -1,6 +1,27 @@
-# Interaktives Quiz (Dash)
+# Quiz – Web-App 
 
-Dies ist eine interaktive Quiz-Webanwendung, entwickelt mit Python, Dash, Bootstrap und Plotly. Sie lädt Fragen aus einer CSV- oder XLSX-Datei und bietet Multiple-Choice- sowie Freitext-Fragen mit Auswertungsfunktion.
+Browserbasierter Fragenkatalog – ideal zum Üben von Multiple-Choice-Fragen. Sie ist inspiriert vom Aufbau klassischer Fahrschul-Apps, aber vollständig anpassbar.
+Entwickelt mit Python, Dash, Pandas und Bootstrap.
+
+---
+
+## 🌐 Funktionen
+
+- 📋 Lokaler Fragenkatalog (aus Excel/CSV importiert)
+- 🎯 Multiple-Choice-Antworten mit Auswertung
+- 💡 Fortschrittsanzeige
+- 📱 Responsive Design
+
+---
+
+## 🛠️ Installation & Setup
+
+### 🔁 Repository klonen
+
+```bash
+git clone https://github.com/eselmilcharmy/Rechnernetze-Quiz.git
+cd Rechnernetze-Quiz
+```
 
 ---
 
@@ -33,12 +54,12 @@ Die Fragen müssen sich in einer Datei namens `quiz_data.csv` **oder** `quiz_dat
 
 ## 🖥️ Ausführen der App
 
-Navigiere im Terminal zum Projektordner (der Ordner, der die Datei `app.py` enthält).
+Navigiere im Terminal zum Projektordner (der Ordner, der die Datei `index.py` enthält).
 
 ### Windows/macOS/Linux:
 
 ```bash
-python app.py
+python index.py
 ```
 
 Die Anwendung startet automatisch unter:
@@ -49,35 +70,12 @@ http://127.0.0.1:8050/
 
 ---
 
-## 🔄 Funktionen
+## 🤝 Mitwirken
 
-- Zufällige Frageauswahl
-- MC- oder Freitextmodus
-- Sofortige Auswertung der Antworten
-- Punktestand-Tracking
-- „Falsche Fragen erneut lernen“-Funktion
-- Fortschrittsbalken
+Pull Requests sind willkommen! Öffne bei Fragen gerne ein Issue.
 
 ---
 
-## 📁 Projektstruktur (Beispiel)
+## 📄 Lizenz
 
-```
-quiz-app/
-├── app.py
-├── Data/
-│   └── quiz_data.csv
-```
-
----
-
-## 👤 Autor
-
-[Albinot Hajrizaj](mailto:albinot.hajrizaj@example.com)  
-© 2025
-
----
-
-## 📃 Lizenz
-
-MIT License
+MIT © 2025 Albinot Hajrizaj
